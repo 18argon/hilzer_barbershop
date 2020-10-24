@@ -1,3 +1,4 @@
+// Adaptado de https://www.geeksforgeeks.org/queue-set-1introduction-and-array-implementation/
 // C program for array implementation of queue
 #include <limits.h>
 #include <stdio.h>
@@ -57,8 +58,8 @@ void push(struct Queue* queue, sem_t *item)
 // It changes front and size
 sem_t* pop(struct Queue* queue)
 {
-    // if (isEmpty(queue))
-    //     return;
+    if (isEmpty(queue))
+        return NULL;
     sem_t* item = queue->array[queue->front];
     queue->front = (queue->front + 1)
                    % queue->capacity;
@@ -69,15 +70,15 @@ sem_t* pop(struct Queue* queue)
 // Function to get front of queue
 sem_t* front(struct Queue* queue)
 {
-    // if (isEmpty(queue))
-    //     return INT_MIN;
+    if (isEmpty(queue))
+        return NULL;
     return queue->array[queue->front];
 }
 
 // Function to get rear of queue
 sem_t* rear(struct Queue* queue)
 {
-    // if (isEmpty(queue))
-    //     return INT_MIN;
+    if (isEmpty(queue))
+        return NULL;
     return queue->array[queue->rear];
 }
