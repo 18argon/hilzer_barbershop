@@ -49,20 +49,22 @@ int main() {
         }
     }
 
-    for(i = 0; i < BARBERS; i++) {
-        if(pthread_join(barbers[i], NULL) != 0) {
-            perror("Problema no join");
-            exit(EXIT_FAILURE);
-        }
-    }
-
     for(i = 0; i < CUSTOMERS; i++) {
         if(pthread_join(customers[i], NULL) != 0) {
             perror("Problema no join");
             exit(EXIT_FAILURE);
         }
     }
-    
+
+    sleep(1);
+    printf("Todos os clientes foram atendidos");
+
+    for(i = 0; i < BARBERS; i++) {
+        printf("--%lu encerrou o seu expediente\n", barbers_id[i]);
+        pthread_cancel(barbers[i]);
+    }
+
+
     sem_destroy(&sofa);
     sem_destroy(&customer1);
     sem_destroy(&customer2);
