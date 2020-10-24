@@ -39,7 +39,7 @@ int main()
         barbers_id[i] = (i + 1) * 100;
         if (pthread_create(&barbers[i], NULL, barberThread, (void *)&barbers_id[i]) != 0)
         {
-            perror("Problema na criacao da thread");
+            perror("Problema na criacao da thread\n");
             exit(EXIT_FAILURE);
         }
     }
@@ -49,7 +49,7 @@ int main()
         customers_id[i] = i + 1;
         if (pthread_create(&customers[i], NULL, customerThread, (void *)&customers_id[i]) != 0)
         {
-            perror("Problema na criacao da thread");
+            perror("Problema na criacao da thread\n");
             exit(EXIT_FAILURE);
         }
     }
@@ -58,13 +58,13 @@ int main()
     {
         if (pthread_join(customers[i], NULL) != 0)
         {
-            perror("Problema no join");
+            perror("Problema no join\n");
             exit(EXIT_FAILURE);
         }
     }
 
     sleep(1);
-    printf("Todos os clientes foram atendidos");
+    printf("Todos os clientes foram atendidos\n");
 
     for (i = 0; i < BARBERS; i++)
     {
@@ -130,7 +130,7 @@ void *customerThread(void *args)
     {
         pthread_mutex_unlock(&mutex1);
         printf("%lu sifude loja cheia\n", id);
-        return 1;
+        pthread_exit((void *) EXIT_SUCCESS);
     }
     customers++;
     push(queue_1, &sem1);
@@ -157,5 +157,5 @@ void *customerThread(void *args)
     printf("%lu RECEBEU\n", id);
     customers--;
     pthread_mutex_unlock(&mutex1);
-    return 0;
+    pthread_exit((void *) EXIT_SUCCESS);
 }
