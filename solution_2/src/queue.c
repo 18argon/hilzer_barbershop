@@ -19,6 +19,8 @@ queue_t *createQueue(unsigned capacity)
     queue->rear = capacity - 1;
     queue->array = (int *)malloc(
         queue->capacity * sizeof(int));
+
+    pthread_mutex_init(&(queue->mutex), NULL);
     return queue;
 }
 
@@ -26,35 +28,52 @@ queue_t *createQueue(unsigned capacity)
 // equal to the capacity
 int isFull(queue_t *queue)
 {
-    return (queue->size == queue->capacity);
+    int size;
+    pthread_mutex_lock(&(queue->mutex));
+    size = queue->size;
+    pthread_mutex_unlock(&(queue->mutex));
+    return size == queue->capacity;
 }
 
 // Queue is empty when size is 0
 int isEmpty(queue_t *queue)
 {
-    return (queue->size == 0);
+    int size;
+    pthread_mutex_lock(&(queue->mutex));
+    size = queue->size;
+    pthread_mutex_unlock(&(queue->mutex));
+    return size == 0;
 }
 
 // Function to add an item to the queue.
 // It changes rear and size
 void push(queue_t *queue, int item)
 {
-    if (isFull(queue))
+    pthread_mutex_lock(&(queue->mutex));
+    if (queue->size == queue->capacity) {
+        pthread_mutex_unlock(&(queue->mutex));
         return;
+    }
     queue->rear = (queue->rear + 1) % queue->capacity;
     queue->array[queue->rear] = item;
     queue->size = queue->size + 1;
+    pthread_mutex_unlock(&(queue->mutex));
+    // printf("pushed %d\n", item);
 }
 
 // Function to remove an item from queue.
 // It changes front and size
 int pop(queue_t *queue)
 {
-    if (isEmpty(queue))
+    pthread_mutex_lock(&(queue->mutex));
+    if (queue->size == 0) {
+        pthread_mutex_unlock(&(queue->mutex));
         return INT_MIN;
+    }
     int item = queue->array[queue->front];
     queue->front = (queue->front + 1) % queue->capacity;
     queue->size = queue->size - 1;
+    pthread_mutex_unlock(&(queue->mutex));
     return item;
 }
 

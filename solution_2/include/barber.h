@@ -10,9 +10,10 @@
 typedef struct barber_t {
     int *id;
     queue_t *cashRegisterQueue;
+    sem_t sem;
 } barber_t;
 
-barber_t *make_barber(pthread_t *thread, void *(*routine) (void *), int id);
+barber_t *make_barber(int id);
 
 void destroy_barber(barber_t *barber);
 

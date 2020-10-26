@@ -8,7 +8,7 @@
 #include "../include/barber.h"
 
 #define N_BARBERS 3
-#define N_CUSTOMERS 25
+#define N_CUSTOMERS 10
 #define BARBERSHOP_CAPACITY 20
 
 void *barber_routine(void *args);
@@ -64,13 +64,21 @@ int main()
     for (i = 0; i < N_BARBERS; i++)
     {
         int id = i;
-        barbers[i] = make_barber(&barbers_threads[i], barber_routine, id);
+        barbers[i] = make_barber(id);
+        if (pthread_create(&barbers_threads[i], NULL, barber_routine, (void *) barbers[i]->id) != 0) {
+            perror("Problema na criacao da thread\n");
+            exit(EXIT_FAILURE);
+        }
     }
 
     for (i = 0; i < N_CUSTOMERS; i++)
     {
         int id = i;
-        customers[i] = make_customer(&customers_threads[i], customer_routine, id);
+        customers[i] = make_customer(id);
+        if (pthread_create(&customers_threads[i], NULL, customer_routine, (void *) customers[i]->id) != 0) {
+            perror("Problema na criacao da thread\n");
+            exit(EXIT_FAILURE);
+        }
     }
 
     for (i = 0; i < N_CUSTOMERS; i++)
@@ -117,7 +125,9 @@ void *barber_routine(void *args)
     while (1)
     {
         pthread_mutex_lock(&cashRegister);
-        if (cashRegisterIsOccupied == 0) {
+        if (!isEmpty(barbers[id]->cashRegisterQueue) && cashRegisterIsOccupied == 0) {
+            printf("Barbeiro #%d foi ao caixa\n", id);
+
             cashRegisterIsOccupied = 1;
             pthread_mutex_unlock(&cashRegister);
             while(!isEmpty(barbers[id]->cashRegisterQueue)) {
@@ -128,23 +138,31 @@ void *barber_routine(void *args)
             }
             pthread_mutex_lock(&cashRegister);
             cashRegisterIsOccupied = 0;
-        } 
-        pthread_mutex_unlock(&cashRegister);
+            pthread_mutex_unlock(&cashRegister);
 
-        sem_post(&barber);
-        sem_wait(&anyoneOnSofa);
+        } else if (!isEmpty(sofaQueue)) {
+            printf("Barbeiro #%d foi cortar cabelo\n", id);
+            sem_post(&barber);
+            customer_id = pop(sofaQueue);
+            pthread_mutex_unlock(&cashRegister);
+            // sem_wait(&anyoneOnSofa);
+            // pthread_mutex_lock(&sitting);
+            customer = customers[customer_id];
+            // pthread_mutex_unlock(&sitting);
+            sem_post(&(customer->sem));
 
-        pthread_mutex_lock(&sitting);
-        customer_id = pop(sofaQueue);
-        customer = customers[customer_id];
-        pthread_mutex_unlock(&sitting);
-
-        sem_post(&(customer->sem));
-        // inicia o atendimento
-        sleep(1);
-        // atendimento finalizado
-        sem_post(&(customer->sem));
-        push(barbers[id]->cashRegisterQueue, get_id(customer));
+            // inicia o atendimento
+            sleep(1);
+            // atendimento finalizado
+            // va para a fila de pagamento
+            sem_post(&(customer->sem));
+            push(barbers[id]->cashRegisterQueue, get_id(customer));
+        } else {
+            // Caixa ocupado e sofa vazio, ou esperando os outros barbeiros terminarem
+            // para encerrar o dia.
+            pthread_mutex_unlock(&cashRegister);
+            sleep(1);
+        }
     }
 }
 
@@ -159,21 +177,18 @@ void *customer_routine(void *arg)
         printf("Loja cheia! Cliente #%d foi embora.\n", id);
         pthread_exit((void *) EXIT_SUCCESS);
     }
-    printf("Cliente #%d entrou na loja.\n", id);
     customers_count++;
     pthread_mutex_unlock(&door);
+    printf("Cliente #%d entrou na loja.\n", id);
 
+    // Esperando abrir lugar no sofa
     sem_wait(&sofa);
     printf("Cliente #%d sentou no sofa.\n", id);
-    
-        pthread_mutex_lock(&sitting);
-            push(sofaQueue, id);
-        pthread_mutex_unlock(&sitting);
+    push(sofaQueue, id);
+    // sem_post(&anyoneOnSofa);
+    sem_wait(&barber);
     // sem_post(&customer);
-
-        sem_post(&anyoneOnSofa);
-        sem_wait(&barber);
-        sem_wait(&(customers[id]->sem));
+    sem_wait(&(customers[id]->sem));
     sem_post(&sofa);
     printf("Cliente #%d esta sendo atendido.\n", id);
 
@@ -187,11 +202,11 @@ void *customer_routine(void *arg)
     // Esperando o pagamento;
     printf("Cliente #%d esta esperando para pagar.\n", id);
     sem_wait(&(customers[id]->sem));
-    printf("Cliente #%d foi embora.\n", id);
 
     pthread_mutex_lock(&door);
     customers_count--;
     pthread_mutex_unlock(&door);
+    printf("Cliente #%d foi embora.\n", id);
 
     pthread_exit((void *) 0);
 }

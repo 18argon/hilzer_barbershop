@@ -11,7 +11,7 @@ typedef struct customer_t {
     int *id;
 } customer_t;
 
-customer_t *make_customer(pthread_t *thread, void *(*routine) (void *), int id);
+customer_t *make_customer(int id);
 
 void wait_customer(customer_t *customer);
 

@@ -5,6 +5,7 @@
 #include <limits.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <pthread.h>
 
 // A structure to represent a queue
 typedef struct queue_t
@@ -12,6 +13,7 @@ typedef struct queue_t
     int front, rear, size;
     unsigned capacity;
     int *array;
+    pthread_mutex_t mutex;
 } queue_t;
 
 // function to create a queue
