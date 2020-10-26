@@ -9,6 +9,7 @@
 
 #define N_BARBERS 3
 #define N_CUSTOMERS 10
+#define SOFA_SIZE 4
 #define BARBERSHOP_CAPACITY 20
 
 void *barber_routine(void *args);
@@ -40,7 +41,7 @@ void destroy_mutexes() {
 }
 
 void initialize_semaphores() {
-    sem_init(&sofa, 0, N_BARBERS);
+    sem_init(&sofa, 0, SOFA_SIZE);
     sem_init(&barber, 0, N_BARBERS);
     sem_init(&anyoneOnSofa, 0, 0);
 }
@@ -56,7 +57,7 @@ int main()
     int i;
     pthread_t barbers_threads[N_BARBERS], customers_threads[N_CUSTOMERS];
     
-    sofaQueue = createQueue(N_BARBERS);
+    sofaQueue = createQueue(SOFA_SIZE);
 
     initialize_mutexes();
     initialize_semaphores();
