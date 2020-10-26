@@ -12,5 +12,7 @@ barber_t *make_barber(int id) {
 
 void destroy_barber(barber_t *barber) {
     destroy_queue(barber->cashRegisterQueue);
+    sem_destroy(&(barber->sem));
+    free(barber->id);
     free(barber);
 }

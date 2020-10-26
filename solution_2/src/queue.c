@@ -94,6 +94,7 @@ int rear(queue_t *queue)
 }
 
 void destroy_queue(queue_t *queue) {
+    pthread_mutex_destroy(&(queue->mutex));
     free(queue->array);
     free(queue);
 }

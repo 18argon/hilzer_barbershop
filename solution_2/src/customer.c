@@ -27,5 +27,6 @@ int get_id(customer_t *customer) {
 
 void destroy_customer(customer_t *customer) {
     sem_destroy(&(customer->sem));
+    free(customer->id);
     free(customer);
 }
