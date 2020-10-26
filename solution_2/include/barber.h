@@ -9,7 +9,7 @@
 
 typedef struct barber_t {
     int *id;
-    queue_t *cashRegisterQueue;
+    queue_t *cash_register_queue;
     sem_t sem;
 } barber_t;
 
