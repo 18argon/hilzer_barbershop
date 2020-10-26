@@ -11,7 +11,7 @@
 #define FALSE 0
 
 #define N_BARBERS 3
-#define N_CUSTOMERS 10
+#define N_CUSTOMERS 25
 #define SOFA_SIZE 4
 #define BARBERSHOP_CAPACITY 20
 
