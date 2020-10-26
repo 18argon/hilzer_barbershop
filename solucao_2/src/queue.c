@@ -1,13 +1,12 @@
-// Adaptado de https://www.geeksforgeeks.org/queue-set-1introduction-and-array-implementation/
-// C program for array implementation of queue
+// Adaptado de
+// https://www.geeksforgeeks.org/queue-set-1introduction-and-array-implementation/
+
 #include <limits.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include "../include/queue.h"
 
-// function to create a queue
-// of given capacity.
-// It initializes size of queue as 0
+// Criacao da fila vazia com determinada capacidade
 queue_t *createQueue(unsigned capacity)
 {
     queue_t *queue = (queue_t *)malloc(
@@ -15,7 +14,6 @@ queue_t *createQueue(unsigned capacity)
     queue->capacity = capacity;
     queue->front = queue->size = 0;
 
-    // This is important, see the enqueue
     queue->rear = capacity - 1;
     queue->array = (int *)malloc(
         queue->capacity * sizeof(int));
@@ -24,8 +22,7 @@ queue_t *createQueue(unsigned capacity)
     return queue;
 }
 
-// Queue is full when size becomes
-// equal to the capacity
+// Retorna se a fila esta cheia caso o tamanho seja igual a capacidade
 int isFull(queue_t *queue)
 {
     int size;
@@ -35,7 +32,7 @@ int isFull(queue_t *queue)
     return size == queue->capacity;
 }
 
-// Queue is empty when size is 0
+// Fila esta vazia caso o tamanho seja zero
 int isEmpty(queue_t *queue)
 {
     int size;
@@ -45,8 +42,7 @@ int isEmpty(queue_t *queue)
     return size == 0;
 }
 
-// Function to add an item to the queue.
-// It changes rear and size
+// Adiciona um item no final da fila
 void push(queue_t *queue, int item)
 {
     pthread_mutex_lock(&(queue->mutex));
@@ -58,11 +54,9 @@ void push(queue_t *queue, int item)
     queue->array[queue->rear] = item;
     queue->size = queue->size + 1;
     pthread_mutex_unlock(&(queue->mutex));
-    // printf("pushed %d\n", item);
 }
 
-// Function to remove an item from queue.
-// It changes front and size
+// Remove um item da fila e retorna esse item
 int pop(queue_t *queue)
 {
     pthread_mutex_lock(&(queue->mutex));
@@ -77,7 +71,7 @@ int pop(queue_t *queue)
     return item;
 }
 
-// Function to get front of queue
+// Retorna a parte da frente da fila
 int front(queue_t *queue)
 {
     if (isEmpty(queue))
@@ -85,7 +79,7 @@ int front(queue_t *queue)
     return queue->array[queue->front];
 }
 
-// Function to get rear of queue
+// Retorna a parte de tras da fila
 int rear(queue_t *queue)
 {
     if (isEmpty(queue))
@@ -93,6 +87,7 @@ int rear(queue_t *queue)
     return queue->array[queue->rear];
 }
 
+// Destroi a fila
 void destroy_queue(queue_t *queue) {
     pthread_mutex_destroy(&(queue->mutex));
     free(queue->array);

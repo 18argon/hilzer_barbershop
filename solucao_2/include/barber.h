@@ -7,6 +7,7 @@
 #include <semaphore.h>
 #include "queue.h"
 
+// Struct do barbeiro, possui um id e a fila de pagamentos desse barbeiro
 typedef struct barber_t {
     int *id;
     queue_t *cash_register_queue;

@@ -6,6 +6,7 @@
 #include <pthread.h>
 #include <semaphore.h>
 
+// Struct do cliente, possui um id e o semaforo associado a esse cliente
 typedef struct customer_t {
     sem_t sem;
     int *id;
