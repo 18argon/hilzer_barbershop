@@ -24,7 +24,7 @@ void initialize_semaphores();
 void destroy_semaphores();
 
 pthread_mutex_t door, cash_register;
-sem_t sofa, barber_available;
+sem_t sofa, barber;
 
 int customers_count = 0;
 queue_t *sofa_queue;
@@ -125,7 +125,7 @@ void *barber_routine(void *args)
 
         } else if (!isEmpty(sofa_queue)) {
             printf("Barbeiro #%d foi cortar cabelo\n", id);
-            sem_post(&barber_available);
+            sem_post(&barber);
             customer_id = pop(sofa_queue);
             pthread_mutex_unlock(&cash_register);
             customer = customers[customer_id];
@@ -168,7 +168,7 @@ void *customer_routine(void *arg)
     push(sofa_queue, id);
     printf("Cliente #%d sentou no sofa.\n", id);
     // Esperando ter um barbeiro disponivel
-    sem_wait(&barber_available);
+    sem_wait(&barber);
     // Esperando ser chamado
     sem_wait(&(customer->sem));
     // Liberou espaço no sofa
@@ -205,10 +205,10 @@ void destroy_mutexes() {
 
 void initialize_semaphores() {
     sem_init(&sofa, 0, SOFA_SIZE);
-    sem_init(&barber_available, 0, N_BARBERS);
+    sem_init(&barber, 0, N_BARBERS);
 }
 
 void destroy_semaphores() {
     sem_destroy(&sofa);
-    sem_destroy(&barber_available);
+    sem_destroy(&barber);
 }

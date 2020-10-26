@@ -13,10 +13,6 @@ typedef struct customer_t {
 
 customer_t *make_customer(int id);
 
-void wait_customer(customer_t *customer);
-
-void signal_customer(customer_t *customer);
-
 int get_id(customer_t *customer);
 
 void destroy_customer(customer_t *customer);

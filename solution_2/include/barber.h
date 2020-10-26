@@ -10,7 +10,6 @@
 typedef struct barber_t {
     int *id;
     queue_t *cash_register_queue;
-    sem_t sem;
 } barber_t;
 
 barber_t *make_barber(int id);

@@ -13,14 +13,6 @@ customer_t *make_customer(int id) {
     return new_customer;
 }
 
-void wait_customer(customer_t *customer) {
-    sem_wait(&customer->sem);
-}
-
-void signal_customer(customer_t *customer) {
-    sem_post(&customer->sem);
-}
-
 int get_id(customer_t *customer) {
     return *customer->id;
 }
